@@ -1,0 +1,11 @@
+loading ?
+                    <View style={{ flex: 1, top: 0, left: 0, justifyContent: 'center' }}>
+                        <Image
+                            source={Images.avatar.female.portrait}
+                            transition={200}
+                            cachePolicy="memory-disk"
+                            style={{ width: SCREEN_WIDTH - 20, height: SCREEN_HEIGHT / SCREEN_WIDTH * (SCREEN_WIDTH - 20) * 0.75 }}
+                            contentFit="cover"
+                        />
+                        <Text style={{ color: '#f7f7f7', position:'absolute' }}>Loading...</Text>
+                        </View>
