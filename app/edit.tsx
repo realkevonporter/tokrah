@@ -55,13 +55,18 @@ export default function EditScreen() {
   }, []);
 
   const handleAddMedia = useCallback(async () => {
-    if (authUser?.medias?.length >= 7) {
+    if ((authUser?.medias?.length ?? 0) >= 7) {
       Alert.alert("Limit reached", "You can only upload up to 7 media.");
       return;
     }
 
     const uri = await pickMedia();
     if (!uri) return;
+
+    if (!authUser || !authUser.id) {
+      Alert.alert("User not found", "You must be logged in to upload media.");
+      return;
+    }
 
     setMediaLoading(true);
 
@@ -70,11 +75,11 @@ export default function EditScreen() {
 
       const newMedia = {
         ...uploaded,
-        position: authUser.medias.length,
+        position: authUser?.medias.length,
       };
 
       // Local update
-      setAuthUser((prev) => ({
+      setAuthUser((prev:any) => ({
         ...prev,
         medias: [...prev.medias, newMedia],
       }));
@@ -88,19 +93,19 @@ export default function EditScreen() {
   }, [authUser, pickMedia, setAuthUser]);
 
   const handleReorderMedia = useCallback(
-    (newOrder) => {
-      const reordered = newOrder.map((m, index) => ({
+    (newOrder:any) => {
+      const reordered = newOrder.map((m:any, index:any) => ({
         ...m,
         position: index,
       }));
 
-      setAuthUser((prev) => ({
+      setAuthUser((prev:any) => ({
         ...prev,
         medias: reordered,
       }));
 
       api.post("/v1/users/media/reorder", {
-        medias: reordered.map((m) => ({
+        medias: reordered.map((m:any) => ({
           id: m.id,
           position: m.position,
         })),
@@ -116,15 +121,17 @@ export default function EditScreen() {
     setLoading(true);
 
     try {
-      const payload = { name: displayName };
-
-      if (!authUser.birthdate && selectedDate) {
+      const payload: { name?: string; birthdate?: string | null } = {};
+      if (displayName !== null && displayName !== undefined) {
+        payload.name = displayName;
+      }
+      if (!authUser?.birthdate && selectedDate) {
         payload.birthdate = selectedDate;
       }
 
       await updateUserInfo(payload);
 
-      setAuthUser((prev) => ({
+      setAuthUser((prev:any) => ({
         ...prev,
         ...payload,
       }));
@@ -139,8 +146,8 @@ export default function EditScreen() {
     setLoading(true);
 
     try {
-      await updateUserInfo({ bio, height: liveHeight });
-      setAuthUser((prev) => ({ ...prev, bio, height: liveHeight }));
+      await updateUserInfo({ bio: bio ?? undefined, height: liveHeight });
+      setAuthUser((prev:any) => ({ ...prev, bio, height: liveHeight }));
     } catch (err) {
       console.log(err);
     }
@@ -153,7 +160,7 @@ export default function EditScreen() {
   // -----------------------------
   const AccountSection = useMemo(
     () =>
-      React.memo(({ title, children }) => (
+      React.memo(({ title, children }:{title:string, children:any}) => (
         <ThemedView
           darkColor={Colors.dark.background}
           lightColor="#e0e1e3ff"
@@ -168,7 +175,7 @@ export default function EditScreen() {
 
   const HeightSlider = useMemo(
     () =>
-      React.memo(({ defaultHeight, onLiveChange, onCommit }) => {
+      React.memo(({ defaultHeight, onLiveChange, onCommit }: {defaultHeight:number, onLiveChange:any, onCommit:any}) => {
         const [height, setHeight] = useState(defaultHeight);
 
         return (
@@ -223,7 +230,7 @@ export default function EditScreen() {
           <AccountSection title="Media">
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
               <SortableGrid
-                medias={authUser.medias}
+                medias={authUser?.medias!}
                 onReorder={handleReorderMedia}
               />
 
@@ -259,8 +266,8 @@ export default function EditScreen() {
             />
 
             <ThemedText style={styles.label}>Birthdate</ThemedText>
-            {authUser.birthdate ? (
-              <ThemedText>{authUser.birthdate}</ThemedText>
+            {authUser?.birthdate ? (
+              <ThemedText>{authUser?.birthdate}</ThemedText>
             ) : (
               <DatePicker
                 style={styles.datePicker}
@@ -285,14 +292,14 @@ export default function EditScreen() {
           <AccountSection title="Height">
             <View style={styles.settingRow}>
               <ThemedText style={styles.label}>
-                {inchesToFeetInches(liveHeight)}
+                {inchesToFeetInches(liveHeight!)}
               </ThemedText>
 
               <HeightSlider
-                defaultHeight={authUser.height}
+                defaultHeight={authUser?.height!}
                 onLiveChange={setLiveHeight}
-                onCommit={(h) =>
-                  setAuthUser((prev) => ({ ...prev, height: h }))
+                onCommit={(h:number) =>
+                  setAuthUser((prev:any) => ({ ...prev, height: h }))
                 }
               />
             </View>
@@ -306,7 +313,7 @@ export default function EditScreen() {
               style={[styles.input, { height: 300 }]}
               onChangeText={setBio}
               placeholder={
-                authUser.bio ??
+                authUser?.bio ??
                 "Add a bio to let people know more about you!"
               }
               autoCapitalize="none"
