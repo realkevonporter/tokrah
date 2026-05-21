@@ -27,6 +27,8 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
       "package": "com.outsiderstosociety.tokrah"
@@ -75,6 +77,12 @@
         "projectId": "5b076d8d-56f9-495f-8416-c2180eaea410"
       }
     },
-    "owner": "outsiderstosociety"
+    "owner": "outsiderstosociety",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/5b076d8d-56f9-495f-8416-c2180eaea410"
+    }
   }
 }
